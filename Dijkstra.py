@@ -86,6 +86,7 @@ def dijkstra(start, end):
 	checked = [False for x in range(73)];
 	dists = [21 for x in range(73)];
 	previous = [0 for x in range(73)];
+	path = [0 for x in range(73)];
 
 	currentNode = start;
 	checked[currentNode] = True;
@@ -93,13 +94,15 @@ def dijkstra(start, end):
 		minDist = sys.maxsize;
 		tempDist = 0;
 		tempIndex = -1;
-		for nextNode in graph[currentNode][1:3]:
+		for index,nextNode in enumerate(graph[currentNode][1:3]):
 			if(nextNode != "n"):
 				tempDist = graph[nextNode][0] + dists[currentNode];
 				if(dists[nextNode] == 21):
+					path[nextNode] = index;
 					previous[nextNode] = currentNode;
 					dists[nextNode] = tempDist;
 				elif(tempDist < dists[nextNode]):
+					path[nextNode] = index;
 					dists[nextNode] = tempDist;
 					previous[nextNode] = currentNode;
 		for index,distance in enumerate(dists):
@@ -109,11 +112,13 @@ def dijkstra(start, end):
 		currentNode = tempIndex;
 		checked[currentNode] = True;
 	currentNode = end;
-	finalPrevious = [end];
+	finalPrevious = [];
+	finalPath = [];
 	while(currentNode != start):
 		finalPrevious.insert(0,previous[currentNode])
+		finalPath.insert(0,path[currentNode]);
 		currentNode = previous[currentNode]
-	return (dists[end],finalPrevious);
+	return (dists[end],finalPrevious,finalPath);
 
 
 #Main
@@ -123,15 +128,20 @@ minDist = sys.maxsize;
 tempIndex = -1;
 previous = [];
 dijkstraDist = [0 for x in range(len(nodePerms))];
+dijkstraNode = [0 for x in range(len(nodePerms))];
 dijkstraPath = [0 for x in range(len(nodePerms))];
 for index,i in enumerate(nodePerms):
 	for indexJ,j in enumerate(i):
 		if(indexJ == 0):
-			dijkstraDist[index] += dijkstra(0,i[indexJ])[0]
-			dijkstraPath[index] = dijkstra(0,i[indexJ])[1]
+			cDijkstra = dijkstra(0,i[indexJ])
+			dijkstraDist[index] += cDijkstra[0]
+			dijkstraNode[index] = cDijkstra[1]
+			dijkstraPath[index] = cDijkstra[2]
 		else:
-			dijkstraDist[index] += dijkstra(i[indexJ-1],i[indexJ])[0]
-			dijkstraPath[index].append(dijkstra(i[indexJ-1],i[indexJ])[1])
+			cDijkstra = dijkstra(i[indexJ-1],i[indexJ])
+			dijkstraDist[index] += cDijkstra[0]
+			dijkstraNode[index].append(cDijkstra[1])
+			dijkstraPath[index].append(cDijkstra[2])
 print(nodePerms)
 print(dijkstraDist)
 for index,i in enumerate(dijkstraDist):
@@ -139,6 +149,9 @@ for index,i in enumerate(dijkstraDist):
 		minDist = i
 		tempIndex = index;
 
+for i in dijkstraNode[tempIndex]:
+	sys.stdout.write(str(i) + " ")
+sys.stdout.write("\n");
 for i in dijkstraPath[tempIndex]:
 	sys.stdout.write(str(i) + " ")
 sys.stdout.write("\n");
