@@ -1,3 +1,13 @@
+# ------------------------------------------------------------------------
+# Dijkstra.py
+# ------------------------------------------------------------------------
+#
+#  Alan Li written on March 17, 2015
+# 
+#  Waffle Revengeance
+#
+# ------------------------------------------------------------------------
+
 import sys
 import itertools
 
@@ -122,15 +132,15 @@ def dijkstra(start, end):
 
 
 #Main
-nodeHitList = [20,68,18];
-nodePerms = list(itertools.permutations(nodeHitList))
+nodeHitList = [20,68,18];	#Put in the 3 parking lots
+nodePerms = list(itertools.permutations(nodeHitList))	#Generate a list of permutations of the parking lots
 minDist = sys.maxsize;
 tempIndex = -1;
 previous = [];
 dijkstraDist = [0 for x in range(len(nodePerms))];
 dijkstraNode = [0 for x in range(len(nodePerms))];
 dijkstraPath = [0 for x in range(len(nodePerms))];
-for index,i in enumerate(nodePerms):
+for index,i in enumerate(nodePerms):	#Run Dijkstra over all permutations
 	for indexJ,j in enumerate(i):
 		if(indexJ == 0):
 			cDijkstra = dijkstra(0,i[indexJ])
@@ -142,8 +152,8 @@ for index,i in enumerate(nodePerms):
 			dijkstraDist[index] += cDijkstra[0]
 			dijkstraNode[index].append(cDijkstra[1])
 			dijkstraPath[index].append(cDijkstra[2])
-print(nodePerms)
-print(dijkstraDist)
+print(nodePerms)	#Check Permutations
+print(dijkstraDist)	#Check Distances
 for index,i in enumerate(dijkstraDist):
 	if(i < minDist):
 		minDist = i
@@ -151,9 +161,9 @@ for index,i in enumerate(dijkstraDist):
 
 for i in dijkstraNode[tempIndex]:
 	sys.stdout.write(str(i) + " ")
-sys.stdout.write("\n");
+sys.stdout.write("\n");	#Node Order
 for i in dijkstraPath[tempIndex]:
 	sys.stdout.write(str(i) + " ")
-sys.stdout.write("\n");
+sys.stdout.write("\n");	#Drive Commands
 
 print("dist is "+str(dijkstraDist[tempIndex]));
