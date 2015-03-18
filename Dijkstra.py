@@ -15,7 +15,7 @@ import itertools
 #Dists, Left, Forward, Right, Node Number
 n = 'n'
 graph = [
-		[  21,   1, n, n, 0  ], #Starting node
+		[  21,   1, n, n, 0  ], #Top left starting node
 		[ 207,   2, n, n, 1  ],
 		[ 284,   3, n, n, 2  ],
 		[ 146,  10,12, n, 3  ],
@@ -88,7 +88,7 @@ graph = [
 		[  72,   n,68, n, 70 ],
 		[  88,  70, n, n, 71 ],
 		[ 147,  31,15, n, 72 ],
-		[  21,  71, n, n, 73 ]
+		[  21,  71, n, n, 73 ]	#Bottom right starting node
 	];
 
 #Regular Dijkstra Algorithm
@@ -123,7 +123,7 @@ def dijkstra(start, end):
 		checked[currentNode] = True;
 	currentNode = end;
 	finalPrevious = [];
-	finalPath = [];
+	finalPath = [4];
 	while(currentNode != start):
 		finalPrevious.insert(0,previous[currentNode])
 		finalPath.insert(0,path[currentNode]);
@@ -131,39 +131,45 @@ def dijkstra(start, end):
 	return (dists[end],finalPrevious,finalPath);
 
 
-#Main
+#Dijkstra algorithm over multiple nodes that need to be moved to
+#currentLoc is the current node the robot is on
+#nodeHitList is the nodes that the robot needs to go to
+def permDijkstra(currentLoc, nodeHitList):
+	nodePerms = list(itertools.permutations(nodeHitList))	#Generate a list of permutations of the parking lots
+	minDist = sys.maxsize;
+	tempIndex = -1;
+	previous = [];
+	dijkstraDist = [0 for x in range(len(nodePerms))];
+	dijkstraNode = [0 for x in range(len(nodePerms))];
+	dijkstraPath = [0 for x in range(len(nodePerms))];
+	for index,i in enumerate(nodePerms):	#Run Dijkstra over all permutations
+		for indexJ,j in enumerate(i):
+			if(indexJ == 0):
+				cDijkstra = dijkstra(currentLoc,i[indexJ])
+				dijkstraDist[index] += cDijkstra[0]
+				dijkstraNode[index] = cDijkstra[1]
+				dijkstraPath[index] = cDijkstra[2]
+			else:
+				cDijkstra = dijkstra(i[indexJ-1],i[indexJ])
+				dijkstraDist[index] += cDijkstra[0]
+				dijkstraNode[index].append(cDijkstra[1])
+				dijkstraPath[index].append(cDijkstra[2])
+	print(nodePerms)	#Check Permutations
+	print(dijkstraDist)	#Check Distances
+	for index,i in enumerate(dijkstraDist):
+		if(i < minDist):
+			minDist = i
+			tempIndex = index;
+
+	for i in dijkstraNode[tempIndex]:
+		sys.stdout.write(str(i) + " ")
+	sys.stdout.write("\n");	#Node Order
+	for i in dijkstraPath[tempIndex]:
+		sys.stdout.write(str(i) + " ")
+	sys.stdout.write("\n");	#Drive Commands
+
+	print("dist is "+str(dijkstraDist[tempIndex]));
+
 nodeHitList = [20,68,18];	#Put in the 3 parking lots
-nodePerms = list(itertools.permutations(nodeHitList))	#Generate a list of permutations of the parking lots
-minDist = sys.maxsize;
-tempIndex = -1;
-previous = [];
-dijkstraDist = [0 for x in range(len(nodePerms))];
-dijkstraNode = [0 for x in range(len(nodePerms))];
-dijkstraPath = [0 for x in range(len(nodePerms))];
-for index,i in enumerate(nodePerms):	#Run Dijkstra over all permutations
-	for indexJ,j in enumerate(i):
-		if(indexJ == 0):
-			cDijkstra = dijkstra(0,i[indexJ])
-			dijkstraDist[index] += cDijkstra[0]
-			dijkstraNode[index] = cDijkstra[1]
-			dijkstraPath[index] = cDijkstra[2]
-		else:
-			cDijkstra = dijkstra(i[indexJ-1],i[indexJ])
-			dijkstraDist[index] += cDijkstra[0]
-			dijkstraNode[index].append(cDijkstra[1])
-			dijkstraPath[index].append(cDijkstra[2])
-print(nodePerms)	#Check Permutations
-print(dijkstraDist)	#Check Distances
-for index,i in enumerate(dijkstraDist):
-	if(i < minDist):
-		minDist = i
-		tempIndex = index;
-
-for i in dijkstraNode[tempIndex]:
-	sys.stdout.write(str(i) + " ")
-sys.stdout.write("\n");	#Node Order
-for i in dijkstraPath[tempIndex]:
-	sys.stdout.write(str(i) + " ")
-sys.stdout.write("\n");	#Drive Commands
-
-print("dist is "+str(dijkstraDist[tempIndex]));
+currentLoc = 0
+permDijkstra(currentLoc,nodeHitList)
