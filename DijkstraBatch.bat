@@ -1,3 +1,3 @@
-cd C:\Users\Alan\LegoRobo\NewLegoRobo
+cd C:\Users\Alan\LegoRobo\PathFinding
 Dijkstra.py
 pause
